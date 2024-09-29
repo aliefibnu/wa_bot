@@ -1,53 +1,54 @@
+// ! Import librari yang dibutuhkan
 const {
-  WAConnection,
-  MessageMedia,
-  MessageType,
-  Presence,
-  Mimetype,
-  GroupSettingChange,
+  BufferJSON,
+  useMultiFileAuthState,
+  makeWASocket,
+  makeInMemoryStore,
 } = require("@whiskeysockets/baileys");
 const fs = require("fs");
+const { Boom } = require("@hapi/boom");
 const qrcode = require("qrcode-terminal");
-const { connect, useMultiFileAuthState } = require("./lib/whatsapp");
 
-(async () => {
-  const auth = useMultiFileAuthState();
-  const { state, saveCreds } = await connect("Baileys", auth);
-  const sock = new WAConnection(state, {
-    logger: console,
-    printQRInTerminal: true,
+async function connectToWhatsapp() {
+  // ! Deklarasi variabel
+  const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
+  const conn = makeWASocket({
     auth: state,
-    syncFull: true,
-    autoReconnect: true,
-    qrRefresh: 10000,
-    qrTimeout: 0,
-    connectTimeoutMS: 60000,
-    maxInflightMsgs: 128,
-    maxCachedMessages: 1000,
-    maxCachedPreKeys: 5 * 1024,
-    printQRInTerminal: false,
-    generateHighQualityQR: false,
-    syncFull: true,
-    browser: ["WA_BOT", "Alief Ibnu", "1.0.0"],
+    browser: ["Alief Ibnu", "WA_BOT", "1.0"],
+    printQRInTerminal: true,
   });
+  const store = makeInMemoryStore({});
+  const storeDbFIle = "./database_chat_baileys.json";
+  const intervalSaveDatabase = 10 * 1000;
 
-  sock.ev.on("connection.update", async (update) => {
+  // ! Login area
+  // ? saveSession saat setelah login
+  conn.ev.on("creds.update", saveCreds);
+  conn.ev.on("connection.update", (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === "close") {
-      if (lastDisconnect.error) {
-        console.log("Connection closed due to an error");
-        console.log(lastDisconnect.error);
-      } else {
-        console.log("Connection closed");
+      const shouldReconnect =
+        lastDisconnect.error instanceof Boom &&
+        lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
+      console.log(
+        "connection closed due to ",
+        lastDisconnect.error,
+        ", reconnecting ",
+        shouldReconnect
+      );
+      // ? reconnect kalau tidak logged out
+      if (shouldReconnect) {
+        connectToWhatsApp();
       }
     } else if (connection === "open") {
-      console.log("Connected");
+      console.log("Koneksi Berhasil");
     }
   });
-
-  sock.ev.on("creds.update", saveCreds);
-
-  sock.ev.on("qr", (qr) => {
-    qrcode.generate(qr, { small: true });
-  });
-})();
+  // ! Simpan chat ke local file
+  store.readFromFile(storeDbFIle);
+  setInterval((x) => {
+    store.writeToFile(storeDbFIle);
+  }, intervalSaveDatabase);
+  store.bind(conn.ev);
+}
+connectToWhatsapp();
