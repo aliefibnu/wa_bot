@@ -4,6 +4,7 @@ const {
   useMultiFileAuthState,
   makeWASocket,
   makeInMemoryStore,
+  DisconnectReason,
 } = require("@whiskeysockets/baileys");
 const fs = require("fs");
 const { Boom } = require("@hapi/boom");
@@ -18,7 +19,7 @@ async function connectToWhatsapp() {
     printQRInTerminal: true,
   });
   const store = makeInMemoryStore({});
-  const storeDbFIle = "./database_chat_baileys.json";
+  const storeDbFIle = "./database/chat_baileys.json";
   const intervalSaveDatabase = 10 * 1000;
 
   // ! Login area
@@ -38,17 +39,23 @@ async function connectToWhatsapp() {
       );
       // ? reconnect kalau tidak logged out
       if (shouldReconnect) {
-        connectToWhatsApp();
+        connectToWhatsapp();
       }
     } else if (connection === "open") {
       console.log("Koneksi Berhasil");
     }
   });
+
   // ! Simpan chat ke local file
   store.readFromFile(storeDbFIle);
   setInterval((x) => {
     store.writeToFile(storeDbFIle);
   }, intervalSaveDatabase);
   store.bind(conn.ev);
+
+  // ! Algoritma kalau ada chat masuk tapi ngambil dari database
+  conn.ev.on("messages.upsert", (message) => {
+    console.log(JSON.stringify(message, null, 2));
+  });
 }
 connectToWhatsapp();
