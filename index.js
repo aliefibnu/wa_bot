@@ -5,13 +5,13 @@ const {
   Presence,
   Mimetype,
   GroupSettingChange,
-} = require("@adiwajshing/baileys");
+} = require("@whiskeysockets/baileys");
 const fs = require("fs");
 const qrcode = require("qrcode-terminal");
-const { connect, useSingleFileAuthState } = require("./lib/whatsapp");
+const { connect, useMultiFileAuthState } = require("./lib/whatsapp");
 
 (async () => {
-  const auth = useSingleFileAuthState("session.json");
+  const auth = useMultiFileAuthState();
   const { state, saveCreds } = await connect("Baileys", auth);
   const sock = new WAConnection(state, {
     logger: console,
@@ -28,7 +28,7 @@ const { connect, useSingleFileAuthState } = require("./lib/whatsapp");
     printQRInTerminal: false,
     generateHighQualityQR: false,
     syncFull: true,
-    browser: ["Baileys", "Safari", "1.0.0"],
+    browser: ["WA_BOT", "Alief Ibnu", "1.0.0"],
   });
 
   sock.ev.on("connection.update", async (update) => {
