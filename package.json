@@ -1,0 +1,29 @@
+{
+  "name": "wa_bot",
+  "version": "1.0.0",
+  "description": "wa bot customized by Alief Ibnu",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliefibnu/wa_bot.git"
+  },
+  "keywords": [
+    "Whatsapp",
+    "Bot",
+    "Baileys",
+    "NodeJS"
+  ],
+  "author": "Alief Ibnu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aliefibnu/wa_bot/issues"
+  },
+  "homepage": "https://github.com/aliefibnu/wa_bot#readme",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.8",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
