@@ -1,0 +1,31 @@
+# Ignore files and directories
+
+# Node.js dependencies
+node_modules/*
+
+# Database files
+database/*
+media/*
+
+# Auth files
+auth_info_baileys/*
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+
+# Other files
+*.tmp
+*.log
+*.csv
+*.json
+*.xml
+*.exe
+*.dll
+*.so
+*.pyc
