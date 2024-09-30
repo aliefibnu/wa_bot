@@ -1,14 +1,14 @@
 # Ignore files and directories
 
 # Node.js dependencies
-node_modules/*
+node_modules/
 
 # Database files
-database/*
-media/*
+database/
+media/
 
 # Auth files
-auth_info_baileys/*
+auth_info_baileys/
 
 
 # OS files
